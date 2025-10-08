@@ -41,7 +41,7 @@ export const signup = async (req,res) =>{
         if(userExists) {
             return res.status(400).json({message: "User already exists"});
         }
-        const user = await user.create({name,email,password})
+        const user = await User.create({name,email,password})
 
         const {accessToken, refreshToken} = generateTokens(user._id)
         await storeRefreshToken(user._id,refreshToken);
@@ -131,3 +131,11 @@ export const refreshToken = async (req,res) => {
         res.status(500).json({message: "Server error", error: error.message});
     }
 }
+
+export const getProfile = async (req, res) => {
+	try {
+		res.json(req.user);
+	} catch (error) {
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};

@@ -1,3 +1,26 @@
-@tailwind base;
-@tailwind components;
+@import "tailwindcss";
+@import "tailwindcss/preflight";
 @tailwind utilities;
+
+  .bg-emerald-600 {
+    background-color: #059669 !important;
+  }
+
+  .hover\\:bg-emerald-700:hover {
+    background-color: #047857 !important;
+  }
+
+  .text-emerald-400 {
+    color: #34d399 !important;
+  }
+
+  .hover\\:text-emerald-300:hover {
+    color: #6ee7b7 !important;
+  }
+  .font-extrabold {
+    font-weight: 800 !important;
+  }
+  .font-bold {
+    font-weight: 700 !important;
+  }
+  

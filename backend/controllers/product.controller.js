@@ -48,6 +48,7 @@ export const createProduct = async(req, res) => {
 
         if (image) {
             cloudinaryResponse = await cloudinary.uploader.upload(image,{folder:"products"})
+            console.log("Cloudinary Response URL:", cloudinaryResponse?.secure_url);
         }
 
         const product = await Product.create({
@@ -67,7 +68,7 @@ export const createProduct = async(req, res) => {
 
 export const deleteProduct = async(req, res) =>{
     try {
-        const product = await Product.findById(res.params.id)
+        const product = await Product.findById(req.params.id)
         
         if (product.image) {
             const publicId = product.image.split("/").pop().split(".")[0]; // This will get the id of the image
@@ -112,16 +113,16 @@ export const getRecommendedProducts = async(req, res) =>{
     }
 }
 
-export const getProductsByCategory = async(req, res) =>{
-    const { category } = req.params;
-    try {
-        const products = await Product.find({ category })
-        res.json(products);
-    } catch (error) {
-        console.log("Error in getProductsByCategory controller", error.message);
-        res.status(500).json({ message: "Server error", error: error.message});
-    }
-}
+export const getProductsByCategory = async (req, res) => {
+	const { category } = req.params;
+	try {
+		const products = await Product.find({ category });
+		res.json({ products });
+	} catch (error) {
+		console.log("Error in getProductsByCategory controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
 
 export const toggleFeaturedProduct = async(req, res) =>{
     try {
