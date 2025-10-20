@@ -66,6 +66,49 @@ export const createProduct = async(req, res) => {
     }
 }
 
+export const updateProduct = async (req, res) => {
+      try {
+          const { id } = req.params;
+          const { name, description, price, category, image } = req.body;
+
+          let product = await Product.findById(id);
+          if (!product) {
+              return res.status(404).json({ message: "Product not found" });
+          }
+
+          let cloudinaryResponse = null;
+          // Kiểm tra nếu có ảnh mới được tải lên (không phải là URL cũ)
+          if (image && !image.startsWith("http")) {
+              // Xóa ảnh cũ trên Cloudinary nếu có
+              if (product.image) {
+                  const publicId = product.image.split("/").pop().split(".")[0];
+                  await cloudinary.uploader.destroy(`products/${publicId}`);
+              }
+              // Tải ảnh mới lên
+              cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "products" });
+          }
+
+          // Cập nhật các trường thông tin
+          product.name = name || product.name;
+          product.description = description || product.description;
+          product.price = price || product.price;
+          product.category = category || product.category;
+          if (cloudinaryResponse) {
+              product.image = cloudinaryResponse.secure_url;
+          }
+
+          const updatedProduct = await product.save();
+
+          // Cập nhật lại cache nếu cần
+          await updatedFeaturedProductsCache();
+
+          res.status(200).json(updatedProduct);
+      } catch (error) {
+          console.log("Error in updateProduct controller", error.message);
+          res.status(500).json({ message: "Server error", error: error.message });
+      }
+  };
+
 export const deleteProduct = async(req, res) =>{
     try {
         const product = await Product.findById(req.params.id)

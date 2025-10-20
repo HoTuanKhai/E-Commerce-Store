@@ -13,6 +13,7 @@ const AnalyticsTab = () => {
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const [dailySalesData, setDailySalesData] = useState([]);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		const fetchAnalyticsData = async () => {
@@ -22,6 +23,7 @@ const AnalyticsTab = () => {
 				setDailySalesData(response.data.dailySalesData);
 			} catch (error) {
 				console.error("Error fetching analytics data:", error);
+				setError("Could not load analytics data. Please try again later.");
 			} finally {
 				setIsLoading(false);
 			}
@@ -34,8 +36,17 @@ const AnalyticsTab = () => {
 		return <div>Loading...</div>;
 	}
 
+	if (error) {
+		return (
+			<div className="flex flex-col items-center justify-center text-center h-96">
+				<AlertTriangle className="h-16 w-16 text-red-400 mb-4" />
+				<h3 className="text-xl font-semibold text-white mb-2">An Error Occurred</h3>
+				<p className="text-red-400">{error}</p>
+			</div>
+		);
+	}
 	return (
-		<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+		<div className='px-4 sm:px-6 lg:px-8'>
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
 				<AnalyticsCard
 					title='Total Users'

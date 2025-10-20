@@ -21,7 +21,7 @@ function App() {
 	const { getCartItems } = useCartStore();
 	useEffect(() => {
 		checkAuth();
-	}, [checkAuth]);
+	}, []);
 
 	useEffect(() => {
 		if (!user) return;

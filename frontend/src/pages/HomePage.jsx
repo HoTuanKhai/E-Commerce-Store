@@ -27,7 +27,7 @@ import { useEffect } from "react";
             Explore Our Categories
           </h1>
           <p className='text-center text-xl text-gray-300 mb-12'>
-            Discover the latest trends in eco-friendly fashion
+            Discover the new figurine in shop 
           </p>
           <div className='h-8' />
 
@@ -36,6 +36,8 @@ import { useEffect } from "react";
               <CategoryItem category={category} key={category.name} />
             ))}
           </div>
+
+          <div className='h-7' />
 
           {!isLoading && products.length > 0 && <FeaturedProducts featuredProducts={products} />}
         </div>
