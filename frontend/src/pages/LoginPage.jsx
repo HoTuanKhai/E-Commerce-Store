@@ -17,6 +17,8 @@ import { useUserStore } from "../stores/useUserStore";
       login(email, password);
     };
 
+    console.log("Loading state in LoginPage:", loading);
+
     return (
       <div className='min-h-screen flex items-center justify-center py-12 sm:px-6 lg:px-8'>
         <div className='sm:mx-auto sm:w-full sm:max-w-lg'>
