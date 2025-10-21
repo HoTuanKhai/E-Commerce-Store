@@ -40,7 +40,7 @@ import { useEffect } from "react";
                       </tr>
                   </thead>
                   <tbody className='bg-gray-800 divide-y divide-gray-700'>
-                      {users.map((user) => (
+                      {users?.map((user) => (
                           <tr key={user._id} className='hover:bg-gray-700'>
                               <td className='px-6 py-4 whitespace-nowrap'>
                                   <div className='text-sm font-medium text-white'>{user.name}</div>
@@ -80,6 +80,11 @@ import { useEffect } from "react";
                               </td>
                           </tr>
                       ))}
+                    {!users && (
+                        <tr>
+                            <td colSpan="4" className="text-center py-4 text-white">Loading users...</td>
+                        </tr>
+                    )}
                   </tbody>
               </table>
           </div>

@@ -77,6 +77,42 @@ import { create } from "zustand";
 			  console.log("REFRESH TOKEN FINISHED, CHECKING AUTH SET TO FALSE");
           }
       },
+    fetchAllUsers: async () => {
+      set({ loading: true });
+      try {
+          const response = await axios.get("/users");
+          set({ users: response.data, loading: false });
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to fetch users");
+          set({ loading: false });
+      }
+	},
+
+	deleteUser: async (userId) => {
+      try {
+          await axios.delete(`/users/${userId}`);
+          set((state) => ({
+              users: state.users.filter((user) => user._id !== userId),
+          }));
+          toast.success("User deleted successfully");
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to delete user");
+      }
+	},
+
+	updateUserRole: async (userId, newRole) => {
+      try {
+          const response = await axios.patch(`/users/${userId}/role`, { role: newRole });
+          set((state) => ({
+              users: state.users.map((user) =>
+                  user._id === userId ? { ...user, role: response.data.role } : user
+              ),
+          }));
+          toast.success("User role updated successfully!");
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to update user role");
+      }
+    },
   }));
 
   // Axios interceptor for token refresh
