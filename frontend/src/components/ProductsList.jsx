@@ -49,6 +49,7 @@ const ProductsList = () => {
 
 	return (
 	<>
+	<div className='h-8' />
 		<motion.div
 			className='bg-gray-800 shadow-lg rounded-lg overflow-hidden max-w-4xl mx-auto'
 			initial={{ opacity: 0, y: 20 }}

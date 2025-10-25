@@ -9,17 +9,19 @@
 
   const CartPage = () => {
       const { cart } = useCartStore();
+      const cartFilledClasses = 'mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8';
+      const emptyCartClasses = 'center-full-viewport';
 
       return (
-          <div className='py-8 md:py-16'>
-              <div className='h-20' />
+          <div className='pt-20'>
+            <div className='h-20' />
               <div className='mx-auto max-w-screen-xl px-4 2xl:px-0'>
-                  <div className='mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8'>
+                  <div className={cart.length > 0 ? cartFilledClasses : emptyCartClasses}>
                       <motion.div
                           className={`mx-auto w-full flex-none ${
                               cart.length > 0
                                   ? "lg:max-w-2xl xl:max-w-4xl"
-                                  : "flex min-h-[50vh] items-center justify-center"
+                                  : ""
                           }`}
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -35,12 +37,14 @@
                               </div>
                           )}
 
-						  <div className='h-5' />
+						  <div className='h-9' />
 						  
                           {cart.length > 0 && (
+                            <div className="mt-12 pt-8 border-t border-gray-700/50">
                               <div className="mt-8 text-center font-bold">
                                   <PeopleAlsoBought />
                               </div>
+                            </div>
                           )}
                       </motion.div>
                       {cart.length > 0 && (
@@ -63,17 +67,16 @@
 
   const EmptyCartUI = () => (
       <motion.div
-          className='flex flex-col items-center justify-center space-y-4 py-16'
+          className='flex flex-col items-center space-y-6'
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
       >
           <ShoppingCart className='h-24 w-24 text-gray-300' />
-          <h3 className='text-2xl font-semibold '>Your cart is empty</h3>
+          <h3 className='text-2xl font-semibold text-gray-100'>Your cart is empty</h3>
           <p className='text-gray-400'>Looks like you {"haven't"} added anything to your cart yet.</p>
           <Link
-              className='mt-4 rounded-md bg-emerald-500 px-6 py-2 text-white transition-colors
-  hover:bg-emerald-600'
+              className='bg-teal-500 hover:bg-teal-400 text-white px-4 py-2 rounded-lg font-semibold shadow-lg shadow-teal-500/50 hover:shadow-xl transition duration-300'
               to='/'
           >
               Start Shopping
