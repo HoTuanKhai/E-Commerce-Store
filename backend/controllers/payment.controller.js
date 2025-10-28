@@ -1,5 +1,7 @@
 import Coupon from "../models/coupon.model.js";
 import Order from "../models/order.model.js";
+import Product from '../models/product.model.js';
+import User from '../models/user.model.js';
 import { stripe } from "../lib/stripe.js";
 
 export const createCheckoutSession = async (req, res) => {
@@ -53,13 +55,7 @@ export const createCheckoutSession = async (req, res) => {
 			metadata: {
 				userId: req.user._id.toString(),
 				couponCode: couponCode || "",
-				products: JSON.stringify(
-					products.map((p) => ({
-						id: p._id,
-						quantity: p.quantity,
-						price: p.price,
-					}))
-				),
+				productIds: JSON.stringify(products.map((p) => p._id)),
 			},
 		});
 
@@ -91,20 +87,56 @@ export const checkoutSuccess = async (req, res) => {
 				);
 			}
 
+			const existingOrder = await Order.findOne({ stripeSessionId: sessionId });
+			if (existingOrder) {
+				console.log(`Order with stripeSessionId ${sessionId} already exists. Skipping order creation.`);
+				return res.status(200).json({
+					success: true,
+					message: "Order already processed.",
+					orderId: existingOrder._id,
+				});
+			}
+
 			// create a new Order
-			const products = JSON.parse(session.metadata.products);
+			const productIds = JSON.parse(session.metadata.productIds);
+			console.log("productIds from metadata:", productIds);
+
+			const user = await User.findById(session.metadata.userId);
+			if (!user) {
+				console.error(`User with ID ${session.metadata.userId} not found.`);
+				return res.status(404).json({ message: "User not found." });
+			}
+			console.log("User's cartItems:", user.cartItems);
+
+			const fetchedProducts = await Product.find({ _id: { $in: productIds } });
+			console.log("Fetched Products from DB:", fetchedProducts);
+
 			const newOrder = new Order({
 				user: session.metadata.userId,
-				products: products.map((product) => ({
-					product: product.id,
-					quantity: product.quantity,
-					price: product.price,
-				})),
-				totalAmount: session.amount_total / 100, // convert from cents to dollars,
+				products: productIds.map((productId) => {
+					const fullProduct = fetchedProducts.find(
+						(fp) => fp && fp._id && fp._id.toString() === productId.toString()
+					);
+					const cartItem = user.cartItems.find(
+						(item) => item && item._id && item._id.toString() === productId.toString()
+					);
+					if (!fullProduct || !cartItem) {
+						console.warn(`Product with ID ${productId} or its cart item not found during order creation.`);
+						return null;
+					}
+					return {
+						product: fullProduct._id,
+						quantity: cartItem.quantity,
+						price: fullProduct.price,
+					};
+				}).filter(Boolean),
+				totalAmount: session.amount_total / 100,
 				stripeSessionId: sessionId,
 			});
 
 			await newOrder.save();
+
+			await User.findByIdAndUpdate(session.metadata.userId, { $set: { cartItems: [] } });
 
 			res.status(200).json({
 				success: true,
