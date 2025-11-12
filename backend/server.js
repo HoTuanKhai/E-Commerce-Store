@@ -25,13 +25,6 @@ const __dirname = path.resolve();
 app.use(express.json({ limit: "10mb" })); // allows you to parse the body of the request
 app.use(cookieParser());
 
-app.get('/', (req, res) => {
-    res.status(200).json({
-        message: 'E-commerce API is live and running!',
-        environment: process.env.NODE_ENV
-    });
-});
-
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
@@ -47,6 +40,13 @@ if (process.env.NODE_ENV === "production") {
 	app.get("*", (req, res) => {
 		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 	});
+} else {
+    app.get('/', (req, res) => {
+    res.status(200).json({
+        message: 'E-commerce API is live and running!',
+        environment: process.env.NODE_ENV
+        });
+    });
 }
 
 app.listen(PORT, () => {
