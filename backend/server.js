@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
+import cors from 'cors';
 
 //routes
 import authRoutes from "./routes/auth.route.js"
@@ -19,7 +20,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const cors = require('cors');
+
 
 const frontendURL = "https://e-commerce-store-azure-five.vercel.app/";
 
