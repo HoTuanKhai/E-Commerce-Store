@@ -1,14 +1,13 @@
-  import express from 'express';
-    import { getAllUsers, deleteUser, updateUserRole } from '../controllers/user.controller.js';
-    import { protectRoute, adminRoute } from '../middleware/auth.middleware.js';
+import express from 'express';
+import { getAllUsers, deleteUser, updateUserRole } from '../controllers/user.controller.js';
+import { protectRoute, adminRoute } from '../middleware/auth.middleware.js';
 
-    const router = express.Router();
+const router = express.Router();
 
-    // Tất cả các route trong file này đều được bảo vệ và chỉ dành cho admin
-    router.use(protectRoute, adminRoute);
+// Tất cả các route trong file này đều được bảo vệ và chỉ dành cho admin
+router.use(protectRoute, adminRoute);
+router.get('/', getAllUsers);
+router.delete('/:id', deleteUser);
+router.patch('/:id/role', updateUserRole);
 
-    router.get('/', getAllUsers);
-    router.delete('/:id', deleteUser);
-    router.patch('/:id/role', updateUserRole);
-
-    export default router;
+export default router;
