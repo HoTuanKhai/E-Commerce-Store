@@ -6,8 +6,8 @@ const router = express.Router();
 
 // Tất cả các route trong file này đều được bảo vệ và chỉ dành cho admin
 router.use(protectRoute, adminRoute);
-router.get('/', getAllUsers);
-router.delete('/:id', deleteUser);
+router.route('/').get(getAllUsers);
+router.route('/:id').delete(deleteUser);
 router.patch('/:id/role', updateUserRole);
 
 export default router;
