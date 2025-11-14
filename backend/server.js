@@ -19,8 +19,17 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const cors = require('cors');
+
+const frontendURL = "https://e-commerce-store-azure-five.vercel.app/";
 
 const __dirname = path.resolve();
+
+app.use(cors({
+    origin: frontendURL, // CHỈ chấp nhận request từ tên miền Vercel này
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true // Cho phép cookies và headers ủy quyền (Authorization headers)
+}));
 
 app.use(express.json({ limit: "10mb" })); // allows you to parse the body of the request
 app.use(cookieParser());
