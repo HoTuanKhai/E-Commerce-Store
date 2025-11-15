@@ -1,25 +1,33 @@
- import { Link } from "react-router-dom";
-  import { useCartStore } from "../stores/useCartStore";
-  import { motion } from "framer-motion";
-  import { ShoppingCart } from "lucide-react";
-  import CartItem from "../components/CartItem";
-  import PeopleAlsoBought from "../components/PeopleAlsoBought";
-  import OrderSummary from "../components/OrderSummary";
-  import GiftCouponCard from "../components/GiftCouponCard";
+import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useCartStore } from "../stores/useCartStore";
+import { motion } from "framer-motion";
+import { ShoppingCart } from "lucide-react";
+import CartItem from "../components/CartItem";
+import PeopleAlsoBought from "../components/PeopleAlsoBought";
+import OrderSummary from "../components/OrderSummary";
+import GiftCouponCard from "../components/GiftCouponCard";
 
   const CartPage = () => {
-      const { cart } = useCartStore();
+      const { cart, getCartItems } = useCartStore((state) => ({
+        cart: state.cart,
+        getCartItems: state.getCartItems,
+        }));
+        useEffect(() => {
+        getCartItems();
+    }, [getCartItems]);
       const cartFilledClasses = 'mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8';
       const emptyCartClasses = 'center-full-viewport';
+      const safeCart = Array.isArray(cart) ? cart : [];
 
       return (
           <div className='pt-20'>
             <div className='h-20' />
               <div className='mx-auto max-w-screen-xl px-4 2xl:px-0'>
-                  <div className={cart.length > 0 ? cartFilledClasses : emptyCartClasses}>
+                  <div className={safeCart.length > 0 ? cartFilledClasses : emptyCartClasses}>
                       <motion.div
                           className={`mx-auto w-full flex-none ${
-                              cart.length > 0
+                              safeCart.length > 0
                                   ? "lg:max-w-2xl xl:max-w-4xl"
                                   : ""
                           }`}
@@ -27,11 +35,11 @@
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.5, delay: 0.2 }}
                       >
-                          {cart.length === 0 ? (
+                          {safeCart.length === 0 ? (
                               <EmptyCartUI />
                           ) : (
                               <div className='space-y-6'>
-                                  {cart.map((item) => (
+                                  {safeCart.map((item) => (
                                       <CartItem key={item._id} item={item} />
                                   ))}
                               </div>
@@ -39,7 +47,7 @@
 
 						  <div className='h-9' />
 						  
-                          {cart.length > 0 && (
+                          {safeCart.length > 0 && (
                             <div className="mt-12 pt-8 border-t border-gray-700/50">
                               <div className="mt-8 text-center font-bold">
                                   <PeopleAlsoBought />
@@ -47,7 +55,7 @@
                             </div>
                           )}
                       </motion.div>
-                      {cart.length > 0 && (
+                      {safeCart.length > 0 && (
                           <motion.div
                               className='mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full'
                               initial={{ opacity: 0, x: 20 }}
