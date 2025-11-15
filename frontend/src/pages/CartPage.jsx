@@ -9,9 +9,9 @@ import OrderSummary from "../components/OrderSummary";
 import GiftCouponCard from "../components/GiftCouponCard";
 
   const CartPage = () => {
-      const { cart, getCartItems } = useCartStore((state) => ({
-        cart: state.cart,
-        getCartItems: state.getCartItems,
+        const { cart = [], getCartItems } = useCartStore((state) => ({
+            cart: Array.isArray(state.cart) ? state.cart : [], 
+            getCartItems: state.getCartItems,
         }));
         useEffect(() => {
         getCartItems();
