@@ -66,8 +66,8 @@ export const useCartStore = create((set, get) => ({
 	removeFromCart: async (productId) => {
 		try{
 			const res = await axios.delete(`/cart`, { data: { productId } });
-			const updatedCart = res.data.data || [];
-			set({ cart: updatedCart.filter((item) => item._id !== productId) });
+			const updatedCart = Array.isArray(res.data.data) ? res.data.data : []; 
+			set({ cart: updatedCart });
 			get().calculateTotals();
 		} catch (error) {
 			toast.error(error.response?.data?.message || "An error occurred");
