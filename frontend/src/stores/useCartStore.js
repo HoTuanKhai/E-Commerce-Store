@@ -36,11 +36,13 @@ export const useCartStore = create((set, get) => ({
 	getCartItems: async () => {
 		try {
 			const res = await axios.get("/cart");
-			set({ cart: res.data });
+			const cartProducts = res.data.data || [];
+			set({ cart: cartProducts });
 			get().calculateTotals();
 		} catch (error) {
 			set({ cart: [] });
-			toast.error(error.response.data.message || "An error occurred");
+			const errorMessage = error.response?.data?.message || "An error occurred while fetching cart items";
+            toast.error(errorMessage);
 		}
 	},
 	clearCart: async () => {
@@ -48,27 +50,28 @@ export const useCartStore = create((set, get) => ({
 	},
 	addToCart: async (product) => {
 		try {
-			await axios.post("/cart", { productId: product._id });
+			const res = await axios.post("/cart", { productId: product._id });
+
+			const updatedCart = res.data.data || [];
+            set({ cart: updatedCart });
+
+			
 			toast.success("Product added to cart");
 
-			set((prevState) => {
-				const existingItem = prevState.cart.find((item) => item._id === product._id);
-				const newCart = existingItem
-					? prevState.cart.map((item) =>
-							item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
-					  )
-					: [...prevState.cart, { ...product, quantity: 1 }];
-				return { cart: newCart };
-			});
 			get().calculateTotals();
 		} catch (error) {
 			toast.error(error.response.data.message || "An error occurred");
 		}
 	},
 	removeFromCart: async (productId) => {
-		await axios.delete(`/cart`, { data: { productId } });
-		set((prevState) => ({ cart: prevState.cart.filter((item) => item._id !== productId) }));
-		get().calculateTotals();
+		try{
+			const res = await axios.delete(`/cart`, { data: { productId } });
+			const updatedCart = res.data.data || [];
+			set({ cart: updatedCart.filter((item) => item._id !== productId) });
+			get().calculateTotals();
+		} catch (error) {
+			toast.error(error.response?.data?.message || "An error occurred");
+		}
 	},
 	updateQuantity: async (productId, quantity) => {
 		if (quantity === 0) {
@@ -76,11 +79,16 @@ export const useCartStore = create((set, get) => ({
 			return;
 		}
 
-		await axios.put(`/cart/${productId}`, { quantity });
-		set((prevState) => ({
-			cart: prevState.cart.map((item) => (item._id === productId ? { ...item, quantity } : item)),
-		}));
-		get().calculateTotals();
+		try {
+			const res = await axios.put(`/cart/${productId}`, { quantity });
+			const updatedCart = res.data.data || [];
+			set((prevState) => ({
+				cart: updatedCart.map((item) => (item._id === productId ? { ...item, quantity } : item)),
+			}));
+			get().calculateTotals();
+		} catch (error) {
+			toast.error(error.response?.data?.message || "An error occurred");
+		}
 	},
 	calculateTotals: () => {
 		const { cart, coupon } = get();
