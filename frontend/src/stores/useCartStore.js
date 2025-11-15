@@ -35,10 +35,10 @@ export const useCartStore = create((set, get) => ({
 
 	getCartItems: async () => {
 		try {
-			const res = await axios.get("/cart");
-			const cartProducts = res.data.data || [];
-			set({ cart: cartProducts });
-			get().calculateTotals();
+            const res = await axios.get("/cart");
+            const cartProducts = Array.isArray(res.data.data) ? res.data.data : []; 
+            set({ cart: cartProducts });
+            get().calculateTotals();
 		} catch (error) {
 			set({ cart: [] });
 			const errorMessage = error.response?.data?.message || "An error occurred while fetching cart items";
@@ -52,7 +52,7 @@ export const useCartStore = create((set, get) => ({
 		try {
 			const res = await axios.post("/cart", { productId: product._id });
 
-			const updatedCart = res.data.data || [];
+			const updatedCart = Array.isArray(res.data.data) ? res.data.data : [];
             set({ cart: updatedCart });
 
 			
@@ -81,10 +81,24 @@ export const useCartStore = create((set, get) => ({
 
 		try {
 			const res = await axios.put(`/cart/${productId}`, { quantity });
-			const updatedCart = res.data.data || [];
-			set((prevState) => ({
-				cart: updatedCart.map((item) => (item._id === productId ? { ...item, quantity } : item)),
-			}));
+			const updatedCart = Array.isArray(res.data.data) ? res.data.data : [];
+			if (updatedCart.length > 0) {
+
+                 set({ cart: updatedCart });
+
+            } else {
+
+                set((prevState) => ({
+
+                    cart: Array.isArray(prevState.cart) ? prevState.cart.map((item) => (
+
+                        item._id === productId ? { ...item, quantity } : item
+
+                    )) : [] 
+
+                }));
+
+            }
 			get().calculateTotals();
 		} catch (error) {
 			toast.error(error.response?.data?.message || "An error occurred");
